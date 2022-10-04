@@ -13,7 +13,6 @@ pub enum XrHandSide {
 ///Spawns hands
 fn init_hands(
     mut commands: Commands,
-    mut world: ResMut<World>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -32,7 +31,7 @@ fn init_hands(
             ..default()
         })
         .id();
-    world.insert_resource(XrLeftHand(left_hand));
+    commands.insert_resource(XrLeftHand(left_hand));
 
     let right_hand = commands
         .spawn()
@@ -47,7 +46,7 @@ fn init_hands(
             ..default()
         })
         .id();
-    world.insert_resource(XrLeftHand(right_hand));
+    commands.insert_resource(XrRightHand(right_hand));
 }
 
 ///Sets hand transforms to corresponding `XrPose` transforms
@@ -79,7 +78,9 @@ pub struct XrHandsPlugin;
 
 impl Plugin for XrHandsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(init_hands)
+        app.insert_resource(XrLeftHand)
+            .insert_resource(XrRightHand)
+            .add_startup_system(init_hands)
             .add_system(update_hand_transforms);
     }
 }
